@@ -1,0 +1,19 @@
+{
+  "name": "esmutator",
+  "version": "1.0.0",
+  "description": "ECMAScript pattern mutator",
+  "main": "esparse.js",
+  "scripts": {
+    "test": "node test/run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deepak1556/esmutator.git"
+  },
+  "keywords": [
+    "ecmascript",
+    "parser",
+    "pattern"
+  ],
+  "author": "robo <hop2deep@gmail.com>"
+}
