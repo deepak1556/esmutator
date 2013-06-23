@@ -50,48 +50,51 @@ textarea {
   <div class="row">
     <div class="six columns">
 
-<pre id="editor" spellcheck="false" style="height: 350px">
-// Life, Universe, and Everything
-var answer = 6 * 7;
-</pre>
+      <pre id="editor" class="editor" spellcheck="false" style="height: 350px">
+	// Life, Universe, and Everything
+	var answer = 6 * 7;
+      </pre>
+
       <div id="info" class="alert-box secondary">Ready.</div>
 
+      <div class="row">
+	<div class="twelve columns">
+	  <h3 class="subheader"><strong>Mutated</strong> code from the syntax tree</h3>
+	</div>
+      </div>
+
       <div class="twelve columns">
-       <p>Syntax node location info (start, end):
-       <label><input type="checkbox" id="range">Index-based range</label>
-       <label><input type="checkbox" id="loc">Line and column-based</label></p>
-       <label><input type="checkbox" id="comment"> Include comments</label>
-       <label><input type="checkbox" id="tolerant"> Tolerate errors (<a href="https://code.google.com/p/esprima/issues/detail?id=130">experimental</a>)</label></p>
+	<!--
+	    options can go in here
+	-->
+	<pre id="converted_editor" class="editor" spellcheck="false" style="height: 350px;">
+	</pre>
+
+	<div class="row" style="padding-top: 15px;">
+	  <div class="two columns">
+	    <label class="inline right"><strong>URL: </strong></label>
+          </div>
+	  <div class="ten columns">
+	    <input id="url" type="text" readonly onclick="this.select()">
+	  </div>
+	</div>
       </div>
 
     </div>
 
     <div class="six columns">
       <dl class="tabs">
-        <dd id="show_syntax" class="active"><a href="#">Syntax</a></dd>
         <dd id="show_tree"><a href="#">Tree</a></dd>
-        <dd id="show_tokens"><a href="#">Tokens</a></dd>
       </dl>
       <ul class="tabs-content">
-        <li class="active" id="tab_syntax"><textarea wrap="off" id="syntax" rows="30" readonly></textarea><li>
-        <li id="tab_tree" style="display:none">
+        <li id="tab_tree" class= "active">
           <input class="small radius button secondary right" type="button" value="Collapse All" id="collapse">&nbsp;
           <input class="small radius button secondary right" type="button" value="Expand All" id="expand">
           <div class="yui3-skin-sam"><div id="treeview"></div>
         </li>
-        <li id="tab_tokens" style="display:none"><textarea id="tokens" rows="30" readonly></textarea><li>
       </ul>
     </div>
 
-  </div>
-
-  <div class="row">
-    <div class="two columns">
-      <label class="inline right">URL for this code:</label>
-    </div>
-    <div class="ten columns">
-      <input id="url" type="text" readonly onclick="this.select()">
-    </div>
   </div>
 
   <!-- Footer -->

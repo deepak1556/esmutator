@@ -1,28 +1,3 @@
-/*
-  Copyright (C) 2013 Ariya Hidayat <ariya.hidayat@gmail.com>
-  Copyright (C) 2012 Ariya Hidayat <ariya.hidayat@gmail.com>
-  Copyright (C) 2011 Ariya Hidayat <ariya.hidayat@gmail.com>
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-  ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 /*jslint sloppy:true browser:true */
 /*global esprima:true, YUI:true, require:true */
@@ -174,21 +149,16 @@ function parse(delay) {
 
         code = window.editor.getText();
         options = {
-            comment: id('comment').checked,
-            range: id('range').checked,
-            loc: id('loc').checked,
-            tolerant: id('tolerant').checked
+            comment: true,
+            loc: true
         };
 
-        id('tokens').value = '';
         id('info').className = 'alert-box secondary';
 
         try {
             result = esprima.parse(code, options);
             str = JSON.stringify(result, adjustRegexLiteral, 4);
             options.tokens = true;
-            id('tokens').value = JSON.stringify(esprima.parse(code, options).tokens,
-                adjustRegexLiteral, 4);
             if (window.updateTree) {
                 window.updateTree(result);
             }
@@ -202,7 +172,7 @@ function parse(delay) {
             id('info').className = 'alert-box alert';
         }
 
-        el = id('syntax');
+        el = id('show_tree');
         el.value = str;
 
         el = id('url');
@@ -215,50 +185,12 @@ function parse(delay) {
 window.onload = function () {
     function quickParse() { parse(1); }
 
-    document.getElementById('comment').onchange = quickParse;
-    document.getElementById('range').onchange = quickParse;
-    document.getElementById('loc').onchange = quickParse;
-    document.getElementById('tolerant').onchange = quickParse;
-
-    // Special handling for IE.
-    document.getElementById('comment').onclick = quickParse;
-    document.getElementById('range').onclick = quickParse;
-    document.getElementById('loc').onclick = quickParse;
-    document.getElementById('tolerant').onclick = quickParse;
-
-    id('show_syntax').onclick = function () {
-        id('tab_tree').className = id('show_tree').className = '';
-        id('tab_syntax').className = id('show_syntax').className = 'active';
-        id('tab_tokens').className = id('show_tokens').className = '';
-        id('tab_tree').style.display = 'none';
-        id('tab_syntax').style.display = '';
-        id('tab_tokens').style.display = 'none';
-    };
-
-    id('show_tree').onclick = function () {
-        id('tab_tree').className = id('show_tree').className = 'active';
-        id('tab_syntax').className = id('show_syntax').className = '';
-        id('tab_tokens').className = id('show_tokens').className = '';
-        id('tab_tree').style.display = '';
-        id('tab_syntax').style.display = 'none';
-        id('tab_tokens').style.display = 'none';
-        quickParse();
-    };
-
-    id('show_tokens').onclick = function () {
-        id('tab_tree').className = id('show_tree').className = '';
-        id('tab_syntax').className = id('show_syntax').className = '';
-        id('tab_tokens').className = id('show_tokens').className = 'active';
-        id('tab_tree').style.display = 'none';
-        id('tab_syntax').style.display = 'none';
-        id('tab_tokens').style.display = '';
-    };
-
     try {
         require(['custom/editor'], function (editor) {
             var queries, elements, code, i, iz, pair;
 
             window.editor = editor({ parent: 'editor', lang: 'js' });
+	    window.c_editor = editor({ parent: 'converted_editor', lang: 'js' });
             window.editor.getTextView().getModel().addEventListener("Changed", parse);
             parse(100);
 

@@ -36,7 +36,7 @@ div.row.copyright {
     width: 400px;
 }
 
-pre#editor {
+.editor{
     border: 1px solid #ccc;
 }
 
