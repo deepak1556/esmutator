@@ -18,6 +18,12 @@ div.row.copyright {
     padding: 0 0 0 8px;
 }
 
+.name h1 {
+    font-size: 25px;
+    color: #fff;
+    padding-left: 6px;
+}
+
 .textviewContainer {
     background-color: white;
 }
