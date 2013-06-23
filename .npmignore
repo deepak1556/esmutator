@@ -1,0 +1,11 @@
+npm-debug.log
+.DS_Store
+t.js
+esprima.js
+.travis.yml
+.npmignore
+/tmp/
+/.git/
+/node_modules/
+/tools/
+/test/
