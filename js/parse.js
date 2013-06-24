@@ -148,9 +148,10 @@ function parse(delay) {
         }
 
         code = window.editor.getText();
+
         options = {
-            comment: true,
-            loc: true
+            comment: false,
+            loc: false
         };
 
         id('info').className = 'alert-box secondary';
