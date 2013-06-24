@@ -2,7 +2,7 @@
 /*jslint sloppy:true browser:true */
 /*global esprima:true, YUI:true, require:true */
 
-var parseId, tree;
+var parseId, tree, nodes = ["window"], edges = [];
 
 function id(i) {
     return document.getElementById(i);
@@ -48,7 +48,7 @@ YUI({ gallery: 'gallery-2013.01.09-23-24' }).use('gallery-sm-treeview', function
                 Object.prototype.toString.apply(o) === '[object Array]';
         }
 
-        function convert(name, node) {
+        function convert(name, node, parent) {
             var i, key, item, subitem;
 
             item = tree.createNode();
@@ -77,7 +77,12 @@ YUI({ gallery: 'gallery-2013.01.09-23-24' }).use('gallery-sm-treeview', function
                     } else {
                         item.label = item.label + ' [' + node.length + ']';
                         for (i = 0; i < node.length; i += 1) {
-                            subitem = convert(String(i), node[i]);
+			    if(node[i].type === "FunctionDeclaration" || node[i].type === "VariableDeclarator") {
+				nodes.push(node[i].id.name);
+				edges.push([parent, node[i].id.name]);
+				parent = node[i].id.name;
+			    }
+                            subitem = convert(String(i), node[i], parent);
                             if (subitem.children.length === 1) {
                                 item.append(subitem.children[0]);
                             } else {
@@ -95,14 +100,14 @@ YUI({ gallery: 'gallery-2013.01.09-23-24' }).use('gallery-sm-treeview', function
                         for (key in node) {
                             if (Object.prototype.hasOwnProperty.call(node, key)) {
                                 if (key !== 'type') {
-                                    subitem.append(convert(key, node[key]));
+                                    subitem.append(convert(key, node[key], parent));
                                 }
                             }
                         }
                     } else {
                         for (key in node) {
                             if (Object.prototype.hasOwnProperty.call(node, key)) {
-                                item.append(convert(key, node[key]));
+                                item.append(convert(key, node[key], parent));
                             }
                         }
                     }
@@ -120,8 +125,10 @@ YUI({ gallery: 'gallery-2013.01.09-23-24' }).use('gallery-sm-treeview', function
 
         tree.clear();
         document.getElementById('treeview').innerHTML = '';
-        tree.rootNode.append(convert('Program body', syntax.body));
+        tree.rootNode.append(convert('Program body', syntax.body, "window"));
         tree.render();
+
+	rendergraph();
 
         expandAll();
     };
@@ -161,11 +168,13 @@ function parse(delay) {
             str = JSON.stringify(result, adjustRegexLiteral, 4);
             options.tokens = true;
             if (window.updateTree) {
+		nodes = ["window"], edges = [];
                 window.updateTree(result);
             }
             id('info').innerHTML = 'No error';
         } catch (e) {
             if (window.updateTree) {
+	        nodes = ["window"], edges = [];
                 window.updateTree();
             }
             str = e.name + ': ' + e.message;
@@ -180,11 +189,73 @@ function parse(delay) {
         el.value = location.protocol + "//" + location.host + location.pathname + '?code=' + encodeURIComponent(code);
 
         parseId = undefined;
+
     }, delay || 811);
 }
 
+function rendergraph() {
+
+	console.log(nodes, edges);
+
+    var graphJSON = {
+	"nodes" : nodes,
+	"edges": edges
+    }
+
+    var graph = new Springy.Graph();
+    graph.loadJSON(graphJSON);
+
+    var layout = new Springy.Layout.ForceDirected(
+	graph,
+	200.0,
+	400.0,
+	0.5
+    );
+
+    var canvas = id('springy');
+    var ctx = canvas.getContext('2d');
+
+    var renderer = new Springy.Renderer(
+	layout,
+	function clear() {
+	    ctx.clearRect(0, 0, 400, 350);
+	},
+	function drawEdge(edge, p1, p2) {
+	    ctx.save();
+	    ctx.translate(200, 20);
+
+	    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+	    ctx.lineWidth = 2.0;
+
+	    ctx.beginPath();
+	    ctx.moveTo(p1.x * 30, Math.abs(p1.y) * 20);
+	    ctx.lineTo(p2.x * 30, Math.abs(p2.y) * 20);
+	    ctx.stroke();
+
+	    ctx.restore();
+	},
+	function drawNode(node, p) {
+	    ctx.save();
+	    ctx.translate(200, 20);
+	    
+	    ctx.font = "12px 'IM Fell English', 'Times New Roman', serif";
+
+	    var width = ctx.measureText(node.data.label).width;
+	    var x = p.x * 30;
+	    var y = Math.abs(p.y) * 20;
+	    ctx.clearRect(x - width / 2.0 - 5, y - 12, width + 10, 24);
+	    ctx.fillStyle = '#000000';
+	    ctx.fillText(node.data.label, x - width / 2.0, y + 5);
+
+	    ctx.restore();
+	}
+    );
+
+    renderer.start();
+}
+
 window.onload = function () {
-    function quickParse() { parse(1); }
+    function quickParse() { parse(1);}
 
     try {
         require(['custom/editor'], function (editor) {
